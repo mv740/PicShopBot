@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>PicShopBot</title>
+    <link href="https://cdn.rawgit.com/olton/Metro-UI-CSS/develop/build/css/metro.min.css" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/olton/Metro-UI-CSS/master/build/css/metro-schemes.min.css" rel="stylesheet">
+    <style>
+        .form-upload {
+            margin-top: 50%;
+        }
+    </style>
+</head>
+<body class="bg-darkTeal">
+<div class="flex-grid">
+    <div class="row flex-just-center">
+        <div class="cell size3 ">
+            <div class="form-upload padding20 block-shadow bg-white">
+                <form class="" method='post'>
+                    <h1 class="text-light">Search item !! NOT WORKING</h1>
+                    <hr class="thin"/>
+                    <br/>
+                    <div class="input-control file full-size" data-role="input">
+                        <input id='input' type="file" name="file" placeholder="load your image">
+                        <button class="button"><span class="mif-folder"></span></button>
+                    </div>
+                    <br>
+                    <br>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="upload()" class="button primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="cell size3 ">
+            <div class="form-upload padding20 block-shadow bg-white">
+                <form class="" method='post'>
+                    <h1 class="text-light">Search item LINK</h1>
+                    <hr class="thin"/>
+                    <br/>
+                    <div class="input-control file full-size" data-role="input">
+                        <input id='inputText' name="text" placeholder="paste your image link" type="text">
+                        <button class="button helper-button clear"><span class="mif-cross"></span></button>
+                    </div>
+                    <br>
+                    <br>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="Test()" class="button primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdn.rawgit.com/olton/Metro-UI-CSS/develop/build/js/metro.min.js"></script>
+<script>
+    function upload() {
+        //https://developer.mozilla.org/en-US/docs/Using_files_from_web_applications
+        //var selectedFile = $('#input').get(0).files[0];//document.getElementById('input').files[0];
+        var formData = new FormData();
+        formData.append('file', $('input[type=file]')[0].files[0]);
+        //console.log('file : '+selectedFile.name);
+
+
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            contentType: false,
+            cache: false,
+            data: formData,
+            processData: false
+        }).done(function () {
+            console.log("Success: Files sent!");
+        }).fail(function () {
+            console.log("An error occurred, the files couldn't be sent!");
+        });
+
+    }
+    function Test() {
+
+        var url = document.getElementById('inputText').value;
+
+        if(!(url.length))
+        {
+            $.Notify({
+                type : 'alert',
+                caption: 'Error',
+                content: 'please insert a link '
+            });
+        }else {
+
+            $.ajax({
+                url: '/test',
+                type: 'POST',
+                data: {
+                    imageURL: url
+                }
+            }).done(function (data) {
+                console.log("Success: text send!", data);
+
+                var tags = [];
+                for (var tag of data.tags) {
+                    console.log(tag);
+                    tags.push(tag.class)
+                }
+                console.log(tags);
+
+                $.Notify({
+                    type : 'success',
+                    caption: 'Test Result',
+                    content: tags.toString()
+                });
+
+            }).fail(function () {
+                console.log("An error occurred, the text couldn't be sent!");
+            });
+
+        }
+
+    }
+</script>
+</html>
